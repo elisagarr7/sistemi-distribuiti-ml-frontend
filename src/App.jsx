@@ -28,6 +28,10 @@ function App() {
 
   const [trainingMetrics, setTrainingMetrics] = useState(null);
 
+
+  const [activeModel, setActiveModel] =
+  useState(null);
+
   const [
     isMonitoringPipeline,
     setIsMonitoringPipeline,
@@ -145,6 +149,9 @@ function App() {
     ]);
 
     setTrainingMetrics(data.metrics ?? null);
+    setActiveModel(
+      data.active_model ?? null
+    );
   }, []);
 
   const refreshPipelineStatus =
@@ -194,6 +201,23 @@ function App() {
     refreshPipelineStatus,
   ]);
 
+
+  const formatModelVersion = (version) => {
+    if (!version || version.length < 16) {
+      return version;
+    }
+
+    const year = version.slice(0, 4);
+    const month = version.slice(4, 6);
+    const day = version.slice(6, 8);
+
+    const hour = version.slice(9, 11);
+    const minute = version.slice(11, 13);
+    const second = version.slice(13, 15);
+
+    return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+  };
+
   return (
     <div className="app">
       <header className="app-header">
@@ -202,7 +226,7 @@ function App() {
             SISTEMI DISTRIBUITI E CLOUD COMPUTING
           </span>
 
-          <h1>Serverless Product Classification Pipeliner</h1>
+          <h1>Serverless Product Classification Pipeline</h1>
 
           <p>
             Dashboard per gestione e test della pipeline
@@ -399,6 +423,27 @@ function App() {
               </strong>
             </div>
           </div>
+          {activeModel && (
+              <div className="active-model-card">
+                <div>
+                  <span className="active-model-label">
+                    MODELLO ATTIVO
+                  </span>
+
+                  <strong>
+                    {activeModel.algorithm}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Versione</span>
+
+                  <code>
+                    {formatModelVersion(activeModel.version)}
+                  </code>
+                </div>
+              </div>
+            )}
         </section>
 
         <section className="right-column">
@@ -544,6 +589,19 @@ function App() {
                     <p>{prediction.normalized_title}</p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {prediction?.model_version && (
+              <div className="prediction-model-info">
+                <span>
+                  Modello
+                </span>
+
+                <p>
+                  {prediction.algorithm} ·{" "}
+                  {formatModelVersion(prediction.model_version)}
+                </p>
               </div>
             )}
           </div>

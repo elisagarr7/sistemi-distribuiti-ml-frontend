@@ -753,3 +753,66 @@ footer {
 
   margin-top: 8px;
 }
+
+.active-model-card {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 60px;
+
+  width: 100%;
+
+  margin-top: 16px;
+  padding: 18px 20px;
+
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.active-model-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.active-model-card span {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.active-model-card strong {
+  font-size: 1rem;
+}
+
+.active-model-card code {
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.active-model-label {
+  color: var(--primary) !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.prediction-model-info {
+  padding: 12px 14px;
+
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.prediction-model-info span {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.prediction-model-info p {
+  margin: 5px 0 0;
+
+  font-size: 0.82rem;
+}
