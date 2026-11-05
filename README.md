@@ -17,13 +17,14 @@ L'interfaccia permette di utilizzare e testare la pipeline Machine Learning serv
 Attraverso la dashboard è possibile:
 
 - selezionare un dataset CSV;
-- caricarlo nel backend;
-- avviare automaticamente la pipeline;
-- monitorare preprocessing e training;
-- visualizzare le metriche ottenute;
+- caricarlo nel backend e avviare automaticamente la pipeline;
+- monitorare upload, preprocessing e training;
+- visualizzare le metriche finali;
+- confrontare i modelli candidati;
+- vedere quale modello è stato selezionato automaticamente;
+- visualizzare algoritmo e versione del modello attivo;
 - inserire il titolo di un prodotto;
-- ottenere la categoria prevista dal modello;
-- visualizzare la confidence della predizione.
+- ottenere la categoria prevista e la confidence.
 
 ## Requisiti
 
@@ -84,15 +85,25 @@ Aprire questo indirizzo nel browser.
 
 ### Avvio della pipeline
 
-Nella sezione dedicata al training:
+Nella sezione `Pipeline`:
 
 1. selezionare o trascinare il file CSV;
-2. premere `Upload e avvia pipeline`;
-3. attendere il completamento di preprocessing e training.
+2. premere `Avvia pipeline`;
+3. attendere il completamento delle tre fasi.
 
-La dashboard aggiorna automaticamente lo stato delle varie fasi.
+La dashboard aggiorna automaticamente lo stato di:
 
-Quando il training termina vengono visualizzate alcune metriche, tra cui:
+```text
+Upload dataset
+Preprocessing
+Training
+```
+
+Durante l'esecuzione viene effettuato periodicamente il polling di `status-faas`.
+
+### Metriche
+
+Quando il training termina vengono mostrate le principali metriche finali:
 
 ```text
 Accuracy
@@ -102,9 +113,49 @@ Test rows
 Cluster overlap
 ```
 
-### Predizione
+Queste metriche si riferiscono al modello selezionato e valutato sul test set.
 
-Nella sezione dedicata all'inference inserire un titolo, ad esempio:
+### Model Selection
+
+La dashboard mostra il confronto tra:
+
+```text
+Logistic Regression
+Multinomial Naive Bayes
+Linear SVM
+```
+
+Per ogni modello vengono visualizzati:
+
+```text
+Accuracy
+Macro F1
+```
+
+Le metriche di questa sezione sono quelle ottenute sul validation set.
+
+Il modello con il miglior Macro F1 viene evidenziato come selezionato.
+
+### Active Model
+
+La sezione `Active Model` mostra:
+
+```text
+algoritmo attivo
+versione del modello
+```
+
+La versione corrisponde all'identificativo generato durante il training, ad esempio:
+
+```text
+20261104T042133Z
+```
+
+Nell'interfaccia viene mostrata in un formato data/ora più leggibile.
+
+### Inference
+
+Nella sezione `Inference` inserire un titolo, ad esempio:
 
 ```text
 apple iphone 13 128gb
@@ -121,6 +172,8 @@ Il frontend mostra:
 ```text
 categoria prevista
 confidence
+modello utilizzato
+versione
 ```
 
 ## Comunicazione con il backend
@@ -170,43 +223,21 @@ sistemi-distribuiti-ml-forntend/
     │   └── statusApi.js
     │
     └── components/
-        ├── FileDropZone.jsx
-        ├── ProgressBar.jsx
-        └── StatusBadge.jsx
+        └── FileDropZone.jsx
 ```
 
-## Componenti principali
+## Organizzazione del frontend
 
-### FileDropZone
+`App.jsx` gestisce:
 
-Permette di selezionare il dataset CSV tramite file picker oppure drag and drop.
+- stato della pipeline;
+- polling dello stato backend;
+- metriche;
+- model selection;
+- modello attivo;
+- inference.
 
-### ProgressBar
-
-Visualizza lo stato delle fasi:
-
-```text
-Upload
-Preprocessing
-Training
-```
-
-### StatusBadge
-
-Mostra graficamente lo stato delle singole operazioni:
-
-```text
-In attesa
-In esecuzione
-Completato
-Errore
-```
-
-## API frontend
-
-Le chiamate HTTP sono separate dalla parte grafica.
-
-Sono presenti:
+Le chiamate HTTP sono separate nei file:
 
 ```text
 uploadApi.js
@@ -214,13 +245,15 @@ inferenceApi.js
 statusApi.js
 ```
 
-Questa separazione permette di mantenere più semplice il codice dei componenti React.
+Questa separazione mantiene distinta la logica di comunicazione con il backend dalla parte grafica.
+
+`FileDropZone` gestisce la selezione del dataset tramite file picker o drag and drop.
 
 ## Note
 
 Il frontend è pensato per essere utilizzato insieme al backend del progetto.
 
-Prima di avviare una demo è quindi consigliato verificare che:
+Prima di avviare una demo è consigliato verificare che:
 
 ```text
 Docker sia attivo
@@ -228,4 +261,4 @@ MinIO sia disponibile
 le funzioni Nuclio siano operative
 ```
 
-Se `status-faas` non è raggiungibile, l'interfaccia segnala che l'infrastruttura backend non è disponibile.
+Il frontend non implementa direttamente la logica di Machine Learning: visualizza lo stato e i risultati restituiti dalle funzioni serverless del backend.
